@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React, { useRef } from 'react';
 import styled from '@emotion/styled';
-import { mod } from '../../utils/utilFunctions';
+import { fullnameToAbbrivation, mod } from '../../utils/utilFunctions';
 
 const PostContainer = styled.div(() => ({
   width: '300px',
@@ -9,6 +9,33 @@ const PostContainer = styled.div(() => ({
   border: '1px solid #ccc',
   borderRadius: '5px',
   overflow: 'hidden',
+}));
+
+const AuthorProfile = styled.div(() => ({
+  padding: '10px',
+  display: 'flex',
+  gap: '10px',
+}));
+const ProfileImage = styled.div(() => ({
+  boxSizing: 'border-box',
+  width: '48px',
+  height: '48px',
+
+  backgroundColor: '#7f7f7f',
+  borderRadius: '50%',
+  color: 'white',
+  fontWeight: 'bold',
+
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+}));
+const ProfileText = styled.div(() => ({}));
+const ProfileName = styled.div(() => ({
+  fontWeight: 'bold',
+}));
+const ProfileEmail = styled.div(() => ({
+  fontSize: '0.90em',
 }));
 
 const CarouselContainer = styled.div(() => ({
@@ -109,6 +136,13 @@ const Post = ({ post }) => {
 
   return (
     <PostContainer>
+      <AuthorProfile>
+        <ProfileImage>{fullnameToAbbrivation(post.user.name)}</ProfileImage>
+        <ProfileText>
+          <ProfileName>{post.user.name}</ProfileName>
+          <ProfileEmail>{post.user.email}</ProfileEmail>
+        </ProfileText>
+      </AuthorProfile>
       <CarouselContainer>
         <Carousel ref={carouselRef}>
           {post.images.map((image, index) => (
@@ -138,6 +172,11 @@ Post.propTypes = {
       map: PropTypes.func,
     }),
     title: PropTypes.any,
+    user: PropTypes.shape({
+      id: PropTypes.number,
+      name: PropTypes.string,
+      email: PropTypes.string,
+    }),
   }),
 };
 

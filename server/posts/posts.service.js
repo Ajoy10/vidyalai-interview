@@ -1,3 +1,5 @@
+const { fetchUserById } = require('../users/users.service');
+
 const axios = require('axios').default;
 
 /**
@@ -51,4 +53,27 @@ async function fetchImagesForPosts(posts) {
   return result;
 }
 
-module.exports = { fetchPosts, fetchImagesForPosts };
+/**
+ * Fetches users for each post from a remote API and return the list of posts with users attached.
+ * @async
+ * @param {Array} [posts] - The list of posts for fetching users.
+ * @returns {Promise<Array>} - A promise that resolves to an array of posts.
+ */
+async function fetchUsersForPosts(posts) {
+  const result = await Promise.all(
+    posts.map(async post => {
+      try {
+        post.user = await fetchUserById(post.userId);
+        return post;
+      } catch (err) {
+        console.error(err);
+        post.user = { id: '-1', name: 'Unknown', email: 'Unknown' };
+        return post;
+      }
+    }),
+  );
+
+  return result;
+}
+
+module.exports = { fetchPosts, fetchImagesForPosts, fetchUsersForPosts };
