@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import styled from '@emotion/styled';
 import Post from './Post';
 import Container from '../common/Container';
-import useWindowWidth from '../hooks/useWindowWidth';
+import { useWindowWidthContext } from '../contexts/WindowWidthContext';
 
 const PostListContainer = styled.div(() => ({
   display: 'flex',
@@ -37,7 +37,7 @@ export default function Posts() {
   const [isLoading, setIsLoading] = useState(false);
   const [showLoadMoreButton, setShowLoadMoreButton] = useState(true);
 
-  const { isSmallerDevice } = useWindowWidth();
+  const { isSmallerDevice } = useWindowWidthContext();
 
   const paginationIndex = useRef(0);
 
