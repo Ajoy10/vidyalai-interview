@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React, { useRef } from 'react';
 import styled from '@emotion/styled';
+import { mod } from '../../utils/utilFunctions';
 
 const PostContainer = styled.div(() => ({
   width: '300px',
@@ -57,29 +58,51 @@ const Button = styled.button(() => ({
 
 const PrevButton = styled(Button)`
   left: 10px;
+  top: calc(50% - 25px);
 `;
 
 const NextButton = styled(Button)`
   right: 10px;
+  top: calc(50% - 25px);
 `;
 
 const Post = ({ post }) => {
   const carouselRef = useRef(null);
+  const imageRef = useRef([]);
+  const currentImage = useRef(0);
 
   const handleNextClick = () => {
-    if (carouselRef.current) {
-      carouselRef.current.scrollBy({
-        left: 50,
+    if (
+      carouselRef.current &&
+      imageRef.current &&
+      imageRef.current.length > 0
+    ) {
+      currentImage.current = mod(
+        currentImage.current + 1,
+        imageRef.current.length,
+      );
+      imageRef.current[currentImage.current].scrollIntoView({
         behavior: 'smooth',
+        block: 'nearest',
+        inline: 'center',
       });
     }
   };
 
   const handlePrevClick = () => {
-    if (carouselRef.current) {
-      carouselRef.current.scrollBy({
-        left: -70,
+    if (
+      carouselRef.current &&
+      imageRef.current &&
+      imageRef.current.length > 0
+    ) {
+      currentImage.current = mod(
+        currentImage.current - 1,
+        imageRef.current.length,
+      );
+      imageRef.current[currentImage.current].scrollIntoView({
         behavior: 'smooth',
+        block: 'nearest',
+        inline: 'center',
       });
     }
   };
@@ -89,7 +112,10 @@ const Post = ({ post }) => {
       <CarouselContainer>
         <Carousel ref={carouselRef}>
           {post.images.map((image, index) => (
-            <CarouselItem key={index}>
+            <CarouselItem
+              ref={el => (imageRef.current[index] = el)}
+              key={index}
+            >
               <Image src={image.url} alt={post.title} />
             </CarouselItem>
           ))}
