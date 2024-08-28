@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React, { useRef } from 'react';
 import styled from '@emotion/styled';
+import { fullnameToAbbrivation, mod } from '../../utils/utilFunctions';
 
 const PostContainer = styled.div(() => ({
   width: '300px',
@@ -8,6 +9,33 @@ const PostContainer = styled.div(() => ({
   border: '1px solid #ccc',
   borderRadius: '5px',
   overflow: 'hidden',
+}));
+
+const AuthorProfile = styled.div(() => ({
+  padding: '10px',
+  display: 'flex',
+  gap: '10px',
+}));
+const ProfileImage = styled.div(() => ({
+  boxSizing: 'border-box',
+  width: '48px',
+  height: '48px',
+
+  backgroundColor: '#7f7f7f',
+  borderRadius: '50%',
+  color: 'white',
+  fontWeight: 'bold',
+
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+}));
+const ProfileText = styled.div(() => ({}));
+const ProfileName = styled.div(() => ({
+  fontWeight: 'bold',
+}));
+const ProfileEmail = styled.div(() => ({
+  fontSize: '0.90em',
 }));
 
 const CarouselContainer = styled.div(() => ({
@@ -57,39 +85,71 @@ const Button = styled.button(() => ({
 
 const PrevButton = styled(Button)`
   left: 10px;
+  top: calc(50% - 25px);
 `;
 
 const NextButton = styled(Button)`
   right: 10px;
+  top: calc(50% - 25px);
 `;
 
 const Post = ({ post }) => {
   const carouselRef = useRef(null);
+  const imageRef = useRef([]);
+  const currentImage = useRef(0);
 
   const handleNextClick = () => {
-    if (carouselRef.current) {
-      carouselRef.current.scrollBy({
-        left: 50,
+    if (
+      carouselRef.current &&
+      imageRef.current &&
+      imageRef.current.length > 0
+    ) {
+      currentImage.current = mod(
+        currentImage.current + 1,
+        imageRef.current.length,
+      );
+      imageRef.current[currentImage.current].scrollIntoView({
         behavior: 'smooth',
+        block: 'nearest',
+        inline: 'center',
       });
     }
   };
 
   const handlePrevClick = () => {
-    if (carouselRef.current) {
-      carouselRef.current.scrollBy({
-        left: -70,
+    if (
+      carouselRef.current &&
+      imageRef.current &&
+      imageRef.current.length > 0
+    ) {
+      currentImage.current = mod(
+        currentImage.current - 1,
+        imageRef.current.length,
+      );
+      imageRef.current[currentImage.current].scrollIntoView({
         behavior: 'smooth',
+        block: 'nearest',
+        inline: 'center',
       });
     }
   };
 
   return (
     <PostContainer>
+      <AuthorProfile>
+        <ProfileImage>{fullnameToAbbrivation(post.user.name)}</ProfileImage>
+        <ProfileText>
+          <ProfileName>{post.user.name}</ProfileName>
+          <ProfileEmail>{post.user.email}</ProfileEmail>
+        </ProfileText>
+      </AuthorProfile>
       <CarouselContainer>
         <Carousel ref={carouselRef}>
           {post.images.map((image, index) => (
-            <CarouselItem key={index}>
+            <CarouselItem
+              ref={el => (imageRef.current[index] = el)}
+              key={index}
+            >
               <Image src={image.url} alt={post.title} />
             </CarouselItem>
           ))}
@@ -112,6 +172,11 @@ Post.propTypes = {
       map: PropTypes.func,
     }),
     title: PropTypes.any,
+    user: PropTypes.shape({
+      id: PropTypes.number,
+      name: PropTypes.string,
+      email: PropTypes.string,
+    }),
   }),
 };
 
